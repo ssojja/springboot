@@ -49,4 +49,20 @@ public class MemberController {
         model.addAttribute("member", member);
         return "signupResult"; // 회원가입 화면, view name --> templates
     }
+
+    /**
+     * REST API 로그인 화면
+     * */
+    @GetMapping("/restLogin")
+    public String restLogin() {
+        return "restLogin";
+    }
+
+    /**
+     * REST API 회원가입 화면
+     * */
+    @GetMapping("/restSignup")
+    public String restSignup() {
+        return "restSignup";
+    }
 }
