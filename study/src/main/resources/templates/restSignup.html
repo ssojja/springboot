@@ -19,7 +19,7 @@
 
             // 2. PostMapping으로 MemberRestController에 JSON 객체 전송
             //    --> await fetch 함수 요청(request) 및 응답(response) 생성
-            const response = await fetch("http://localhost:8080/restSignup",{
+            const response = await fetch("http://localhost:8080/member/restSignup",{
                   method: "POST",
                   headers: {
                     "Content-Type": "application/json",
