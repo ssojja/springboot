@@ -14,7 +14,7 @@ export const fetchData = async (url) => {
  */
 export const axiosPost = async (url, formData) => {
     const response = await axios.post(url, formData, {"Content-Type" : "application/json"});
-    console.log(response);
+//    console.log(response);
 //    const response = await axios({
 //        method : "POST",
 //        url : url,

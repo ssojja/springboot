@@ -4,8 +4,11 @@ import { validateSignupFormCheck } from '../utils/validate.js';
 import { initForm } from '../utils/init.js';
 import { axiosPost } from '../utils/dataFetch.js';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { getSignup, getIdCheck } from '../feature/auth/authAPI.js';
 
 export function Signup() {
+    const dispatch = useDispatch();
     const navigate = useNavigate();
     const initArray = ['id', 'pwd', 'cpwd', 'name', 'phone', 'emailName', 'emailDomain'];
     // const initForm = initArray.reduce((acc, cur) => {    // 비동기
@@ -31,43 +34,29 @@ export function Signup() {
         const {name, value} = event.target;
         setForm({...form, [name]: value});
         setErrors({...initForm(initArray), emailDomain:""});
-
-        // callback
-        // setForm((prev) => {prev, [name, value]});
     }
 
+    /** ID 중복 체크 */
     const handleIdCheck = async () => {
-        const url = "http://localhost:8080/member/idCheck";
-        const data = { "id" : form.id };
-        const result = await axiosPost(url, data);
-
+        const result = await dispatch(getIdCheck(form.id));
+        alert(result);
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         // 객체 형태로 묶어서 넘길 수 있음
-        const param = { refs:refs, errors: setErrors }
-        console.log(`param.errors`, param.errors);
+        const param = { refs:refs, setErrors: setErrors }
+        const formData = { ...form, email: form.emailName.concat('@', form.emailDomain)};
+        const result = await dispatch(getSignup(formData, param));
 
-        if(validateSignupFormCheck(param)){
-            /**
-                스프링부트 연동 - Post, /member/signup
-            */
-
-            const url = "http://localhost:8080/member/signup";
-            const formData = { ...form, email: form.emailName.concat('@', form.emailDomain)}
-            console.log('FormData ====> ', formData);
-
-            const result = await axiosPost(url, formData);
-            if(result) {
-                alert("회원가입에 성공하셨습니다.");
-                navigate("/login");
-            } else {
-                alert("회원가입에 실패하셨습니다.");
-            }
+        if(result) {
+            alert("회원가입에 성공하셨습니다.");
+            navigate("/login");
+        } else {
+            alert("회원가입에 실패하셨습니다.");
         }
-    }
+    } // handleSubmit
 
     // console.log("form --> ",form)
 

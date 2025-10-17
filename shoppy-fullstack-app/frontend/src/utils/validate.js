@@ -4,7 +4,6 @@
 export const validateFormCheck = ({idRef, pwdRef, errors, setErrors}) => {
     if(idRef.current.value === ""){
         setErrors({...errors, id:"아이디를 입력해주세요."});
-        console.log(errors);
         idRef.current.focus();
         return false;
     } else if(pwdRef.current.value === ""){
@@ -40,7 +39,6 @@ export function validateLoginCheck(refs, setMsg) {
  * Shoppy 회원가입 폼 체크
  */
 export function validateSignupFormCheck({refs, setErrors}) {
-    console.log(`setErrors`, setErrors);
     if(refs.idRef.current.value === "") {
         setErrors({id: "아이디를 입력해주세요"});
         refs.idRef.current.focus();
@@ -50,5 +48,5 @@ export function validateSignupFormCheck({refs, setErrors}) {
         refs.emailDomainRef.current.focus();
         return false;
     }
-//    return true;
+    return true;
 }
