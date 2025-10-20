@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/member")
-@CrossOrigin(origins = {"http://localhost:3000"})
+//@CrossOrigin(origins = {"http://localhost:3000"})
 public class MemberController {
 
     // 서비스 객체 가져오기
@@ -42,10 +42,6 @@ public class MemberController {
     @PostMapping("/login")
     public boolean login(@RequestBody Member member) {
         boolean result = false;
-        
-        // 서비스 호출
-//        result = memberService.login(member);
-
         return memberService.login(member);
     }
 }

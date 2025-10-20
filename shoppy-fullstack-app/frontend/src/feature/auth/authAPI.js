@@ -29,7 +29,8 @@ export const getLogIn = (formData, param) => async (dispatch) => {
             SpringBoot - @RestController, @PostMapping("/member/login")
             axios api 사용
         */
-        const url = "http://localhost:8080/member/login";
+//        const url = "http://localhost:8080/member/login";
+        const url = "/member/login";
         const result = await axiosPost(url, formData);
 
         if(result){

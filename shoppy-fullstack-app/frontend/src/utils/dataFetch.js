@@ -10,6 +10,14 @@ export const fetchData = async (url) => {
 }
 
 /**
+ *  axiosGet 함수를 이용하여 백엔드 연동 처리
+ */
+export const axiosGet = async (url) => {
+    const response = await axios.get(url);
+    return response.data;
+}
+
+/**
  *  axiosPost 함수를 이용하여 백엔드 연동 처리
  */
 export const axiosPost = async (url, formData) => {

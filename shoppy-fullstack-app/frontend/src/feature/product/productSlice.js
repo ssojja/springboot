@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   productList : [],  // 출력 - 2차원 배열
   products: [],  // 원본 - 1차원 배열
-  product: {}
+  product: {},
+  imgList: []
 }
 
 export const productSlice = createSlice({
@@ -14,20 +15,21 @@ export const productSlice = createSlice({
     // action : 컴포넌트에서 오는 값
     createProduct (state, action) {
         const { productList, products } = action.payload;
-        
         state.productList = productList;
         state.products = products;
     },
     filterProduct (state, action) {
-        // const pid = action.payload.pid;  // 둘 다 가능
-        const { pid } = action.payload;
-        
+    // const pid = action.payload.pid;
+        const { product } = action.payload;
+        state.product = product;
+        state.imgList = JSON.parse(product.imgList);
+
         // 방법1. productList가 2차원 배열이므로 flat() 함수를 이용하여 1차원 변경 후 filter
         // const [filterProduct] = state.productList.flat().filter((item)=> item.pid === pid);
         // state.product = filterProduct;
 
         // 방법2. product 1차원 배열에서 find 함수
-        state.product = state.products.find(item => item.pid === pid);
+//        state.product = state.products.find(item => item.pid === pid);
     },
   },
 })
