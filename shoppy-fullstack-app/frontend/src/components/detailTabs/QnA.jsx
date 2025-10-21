@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { axiosData } from '../../utils/dataFetch.js';
+import { getQna } from '../../feature/product/productAPI.js';
 
-export function QnA() {
+export function QnA({pid}) {
     const [data, setData] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [openQid, setOpenQid] = useState(null);
 
     useEffect(()=>{
-        const load = async () => {
-            const jsonData = await axiosData("/data/productQnA.json");
+        const fetch = async () => {
+//             const jsonData = await axiosData("/data/productQnA.json");
+            const jsonData = await getQna(pid);
             setData(jsonData);
         }
-        load();
+        fetch(pid);
     },[]);
 
     const handleToggle = (qid) => {
