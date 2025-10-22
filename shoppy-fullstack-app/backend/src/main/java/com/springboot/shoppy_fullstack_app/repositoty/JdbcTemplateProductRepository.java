@@ -3,6 +3,7 @@ package com.springboot.shoppy_fullstack_app.repositoty;
 import com.springboot.shoppy_fullstack_app.dto.Product;
 import com.springboot.shoppy_fullstack_app.dto.ProductDetailInfo;
 import com.springboot.shoppy_fullstack_app.dto.ProductQna;
+import com.springboot.shoppy_fullstack_app.dto.ProductReturn;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,12 @@ public class JdbcTemplateProductRepository implements ProductRepository{
     public JdbcTemplateProductRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);   // 커넥션 생성
     };
+
+    @Override
+    public ProductReturn findReturn() {
+        String sql = "select rid, title, description, list from product_return";
+        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(ProductReturn.class));
+    }
 
     @Override
     public List<ProductQna> findQna(int pid) {

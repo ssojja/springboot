@@ -176,7 +176,83 @@ where m.id = pq.id
 and p.pid = pq.pid
 and m.id = "hong" and p.pid = 1;
 
-select qid, title, content is_complete as isComplete, is_lock ad isLock, id, pid, cdate from product_qna where pid = 1;
+select qid, title, content, is_complete as isComplete, is_lock as isLock, id, pid, cdate from product_qna where pid = 1;
+
+/****************************************************
+	상품 Return/Delivery 테이블 생성 : product_return
+*****************************************************/
+show tables;
+create table product_return (
+	rid			int				auto_increment	primary key,
+    title		varchar(100)	not null,
+    description	varchar(200),
+    list		json
+);
+
+desc product_return;
+select * from product_return;
+
+-- product_return data insert
+insert into product_return(title, description, list)
+select 
+	jt.title,
+    jt.description,
+    jt.list
+from
+	json_table(
+		cast(load_file('C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/productReturn.json') 
+				AS CHAR CHARACTER SET utf8mb4 ),
+		'$[*]' COLUMNS (
+			 title   		VARCHAR(100)  	PATH '$.title',
+			 description   	VARCHAR(200)  	PATH '$.description',
+			 list			json  			PATH '$.list'
+		   )   
+    ) as jt ;
+
+/******************************
+	장바구니 테이블 생성 : cart
+*******************************/
+-- pid, id, size, qty, cdate
+create table cart(
+	cid		int			auto_increment	primary key,
+    size	char(2)		not null,
+	qty		int			not null,
+    pid		int			not null,
+    id		varchar(50)	not null,
+    cdate	datetime	not null,
+    constraint fk_cart_pid	foreign key(pid) references product(pid)
+	on delete cascade	on update cascade,
+	constraint fk_cart_id	foreign key(id) references member(id)
+	on delete cascade	on update cascade
+);
+
+desc cart;
+select * from cart;
+
+-- my sql은 수정, 삭제 시 update mode를 변경
+set SQL_SAFE_UPDATES = 0;
+
+-- delete from cart where cid in (1,2);
+-- pid:1, size를 이용하여 상품의 존재 check table
+-- checkQty = 1인 경우 cid(o) 유효 데이터
+-- checkQty = 0인 경우 cid(x) 무효 데이터
+select cid, sum(pid=1 AND size='xs') AS checkQty From cart GROUP BY cid
+order by checkQty desc
+limit 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -41,3 +41,13 @@ export const getQna = async (pid) => {
 //    console.log("qna ===> ", qna);
     return qna;
 }
+
+/*
+    상품 return/delivery - 서버 연동
+*/
+export const getReturn = async () => {
+    const url = "/product/return";
+    const returnData = await axiosGet(url);
+    const list = JSON.parse(returnData.list);
+    return {...returnData, list:list};
+}
