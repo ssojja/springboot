@@ -276,7 +276,7 @@ where c.id = "test";
 select 
 	m.id,
     p.pid,
-    
+    p.name,
 	p.image,
 	p.price,
 	c.size,
@@ -287,6 +287,10 @@ select
 	from cart c 
 	inner join product p on c.pid = p.pid
 	where c.id = "test") as total_price
+from member m, product p, cart c
+where m.id = c.id
+	and p.pid = c.pid
+    and m.id = "test";
 
 
 
