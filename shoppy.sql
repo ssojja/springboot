@@ -131,7 +131,7 @@ create table product_qna(
 );
 
 select * from product_qna;
--- DROP TABLE product_qna;  
+-- DROP TABLE cart;  
 
 -- product_qna data insert
 insert into product_qna(title, content, is_complete, is_lock, id, pid, cdate)
@@ -236,12 +236,57 @@ set SQL_SAFE_UPDATES = 0;
 -- pid:1, size를 이용하여 상품의 존재 check table
 -- checkQty = 1인 경우 cid(o) 유효 데이터
 -- checkQty = 0인 경우 cid(x) 무효 데이터
-select cid, sum(pid=1 AND size='xs') AS checkQty From cart GROUP BY cid
-order by checkQty desc
-limit 1;
+SELECT 
+      ifnull(MAX(cid), 0) AS cid,
+      COUNT(*) AS checkQty
+    FROM cart
+    WHERE pid = 1 AND size = 'xs' AND id = 'test';
 
+-- 장바구니 상품 갯수 조회
+select count(qty) from cart where id = "test";
+select ifnull(sum(qty), 0) as sumQty from cart where id = "test";
 
+-- 장바구니 리스트 조회
+-- 어떤 회원이 어떤 상품을 몇 개 넣었는가?
 
+select
+        m.id,
+        p.pid,
+        p.name,
+        p.image,
+        p.price,
+        c.size,
+        c.qty,
+        c.cid
+from product p, cart c, member m
+where p.pid = c.pid
+        and c.id = m.id
+        and m.id = "test";
+
+select ifnull(sum(qty), 0) as sumQty from cart where id = "test";
+select * from cart where id = "test";
+
+-- 장바구니 총 상품 가격 : qty(cart), price (product)
+select 
+	sum(c.qty * p.price) as totalPrice 
+from cart c 
+inner join product p on c.pid = p.pid
+where c.id = "test";
+
+select 
+	m.id,
+    p.pid,
+    
+	p.image,
+	p.price,
+	c.size,
+    c.qty,
+    c.cid,
+    (select 
+		sum(c.qty * p.price) as totalPrice 
+	from cart c 
+	inner join product p on c.pid = p.pid
+	where c.id = "test") as total_price
 
 
 

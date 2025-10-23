@@ -19,8 +19,6 @@ export function ProductDetail() {
     const imgList = useSelector((state) => state.product.imgList);
     const isLogIn = useSelector((state) => state.auth.isLogIn);
 
-    console.log(`isLogIn` , isLogIn);
-
     const [size, setSize] = useState("XS");
     const [tabName, setTabName] = useState('detail');
     const tabLables = ['DETAIL', 'REVIEW', 'Q&A', 'RETURN & DELIVERY'];

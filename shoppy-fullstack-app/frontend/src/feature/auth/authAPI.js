@@ -1,7 +1,10 @@
 import { logIn, logOut } from './authSlice.js';
 import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate.js';
 import { axiosPost } from '../../utils/dataFetch.js';
-/* IdCheck */
+import { getCartCount } from '../../feature/cart/cartAPI.js';
+import { updateCartCount, resetCartCount } from '../../feature/cart/cartSlice.js';
+
+/* Id 중복 체크 */
 export const getIdCheck = (id) => async (dispatch) => {
     const data = { "id" : id };
     const url = "http://localhost:8080/member/idCheck";
@@ -22,7 +25,7 @@ export const getSignup = (formData, param) => async (dispatch) => {
     return result;
 }
 
-/** Login */
+/** LogIn */
 export const getLogIn = (formData, param) => async (dispatch) => {
     if(validateFormCheck(param)){
         /**
@@ -35,13 +38,19 @@ export const getLogIn = (formData, param) => async (dispatch) => {
 
         if(result){
             dispatch(logIn({"userId":formData.id}));
+
+            // 장바구니 카운트 함수 호출
+//            const count = await getCartCount(formData.id);
+            dispatch(getCartCount(formData.id));
             return true;
         }
     }
     return false;
 }
 
+/** LogOut */
 export const getLogOut = () => async (dispatch) => {
     dispatch(logOut());
+    dispatch(resetCartCount());
     return true;
 }

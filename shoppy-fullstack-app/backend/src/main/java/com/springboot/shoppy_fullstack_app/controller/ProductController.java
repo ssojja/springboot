@@ -28,19 +28,16 @@ public class ProductController {
 
     @GetMapping("/all")
     public List<Product> all(){
-        System.out.println("Controller ===>");
         return productService.findAll();
     }
 
     @PostMapping("/detailInfo")
     public ProductDetailInfo detailInfo(@RequestBody Product product){
-        System.out.println("pid ==> " + product.getPid());
         return productService.findDetailInfo(product.getPid());
     }
 
     @PostMapping("/qna")
     public List<ProductQna> qna(@RequestBody Product product){
-        System.out.println("pid ==> " + product.getPid());
         return productService.findQna(product.getPid());
     }
 

@@ -20,14 +20,14 @@ export function Cart() {
                 <div key={item.pid}>
                     <div className='cart-item'>
                         {/* {item.cid} */}
-                        <img src={item.image} alt="product-img" />
+                        <img src={item.image && `/images/${item.image}`} alt="product-img" />
                         <div className='cart-item-details'>
                             <p className='cart-item-title'>{item.name}</p>
                             <p className='cart-item-title'>{item.size}</p>
                             <p className='cart-item-price'>{parseInt(item.price).toLocaleString()}원</p>
                         </div>
                         <div className='cart-quantity'>
-                            <button type='button' onClick={()=>{ dispatch(updateCart(item.cid, '-'))}}>-</button>
+                            <button type='button' onClick={()=>{ item.qty > 1 && dispatch(updateCart(item.cid, '-'))}}>-</button>
                             <input type="text" value={item.qty} readOnly/>
                             <button type='button' onClick={()=>{ dispatch(updateCart(item.cid, '+'))}}>+</button>
                         </div>
