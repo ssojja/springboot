@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SearchForm } from '../components/commons/SearchForm.jsx';
 import { MenuList } from '../components/commons/MenuList.jsx';
 import { axiosData } from '../utils/dataFetch.js';
+import { getList } from '../feature/support/supportAPI.js';
 
 export function Support() {
     const [menus, setMenus] = useState([]);
@@ -11,24 +12,29 @@ export function Support() {
     useEffect(()=>{
         const fetchData = async () => {
             const jsonData = await axiosData("/data/support.json");
+            const list = await getList("all");
             setMenus(jsonData.menus);
             setCategory(jsonData.category);
-            setList(jsonData.list);
+            setList(list);
         }
         fetchData();
     },[])
 
-    const filterList = (type) => {
-        const filter = async () => {
-            const jsonData = await axiosData("/data/support.json");
-            if(type === 'all'){
-                setList(jsonData.list);
-            } else{
-                const filterData = jsonData.list.filter((item)=> item.type === type);
-                setList(filterData);
-            }
-        }
-        filter();
+    const filterList = async (stype) => {
+        console.log("stype ==> ", stype);
+        const list = await getList(stype);
+        setList(list);
+
+//         const filter = async () => {
+//             const jsonData = await axiosData("/data/support.json");
+//             if(type === 'all'){
+//                 setList(jsonData.list);
+//             } else{
+//                 const filterData = jsonData.list.filter((item)=> item.type === type);
+//                 setList(filterData);
+//             }
+//         }
+//         filter();
     }
 
     return (
@@ -54,9 +60,9 @@ export function Support() {
                             </thead>
                             <tbody>
                                 { list && list.map((item, index)=>
-                                    <tr>
+                                    <tr key={index}>
                                         <td>{index+1}</td>
-                                        <td>[{item.type}]</td>
+                                        <td>[{item.stype}]</td>
                                         <td>{item.title}</td>
                                         <td>{item.rdate}</td>
                                         <td>{item.hits}</td>

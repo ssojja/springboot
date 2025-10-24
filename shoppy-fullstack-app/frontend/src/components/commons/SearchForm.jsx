@@ -10,8 +10,8 @@ export function SearchForm({category}) {
         <div>
             <div>
                 <select name="search_cartegory" style={{width:"15%", marginRight:"5px"}}>
-                    { category && category.map(item=>
-                        <option value={item.value}>{item.name}</option>
+                    { category && category.map((item, index)=>
+                        <option value={item.value} key={index}>{item.name}</option>
                     )}
                 </select>
                 <input type="text" name="search_content" style={{width:"40%", marginRight:"5px"}}/>

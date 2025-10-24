@@ -273,8 +273,12 @@ from cart c
 inner join product p on c.pid = p.pid
 where c.id = "test";
 
+-- 회원별 장바구니 리스트 조회
 select 
-	m.id,
+	m.id,    
+	m.name as mname,
+	m.phone,
+	m.email,
     p.pid,
     p.name,
 	p.image,
@@ -292,18 +296,92 @@ where m.id = c.id
 	and p.pid = c.pid
     and m.id = "test";
 
+-- 장바구니 리스트 view 생성
+show tables from information_schema;
+select * from information_schema.views where table_schema = 'shoppy';
+
+drop view view_cartList;
+
+select * from view_cartList where id = "test";
+
+create view view_cartList
+as
+select
+	m.id,
+	m.name as mname,
+	m.phone,
+	m.email,
+	p.pid,
+	p.name,
+	p.info,
+	p.image,
+	p.price,
+	c.size,
+	c.qty,
+	c.cid,
+    t.totalPrice
+ from member m, product p, cart c,
+	(select c.id, sum(c.qty * p.price) as totalPrice 
+		from cart c 
+		inner join product p on c.pid = p.pid
+        group by c.id) as t
+ where m.id = c.id
+	and p.pid = c.pid
+    and c.id = t.id;
+
+select id, mname, phone, email, pid, name, info, image, price, size, qty, vc.cid, totalPrice 
+from view_cartList vc,
+	(select c.cid, sum(c.qty * p.price) as totalPrice 
+		from cart c 
+		inner join product p on c.pid = p.pid
+		where c.id = "kim" 
+        group by c.cid) as total
+where vc.cid = total.cid;
+
+-- select a, (select ~~~) as b <-- 스칼라 서브쿼리
+-- from test, (select ~~~) as t <-- 인라인뷰
+-- where id = (select ~~~) <-- 서브쿼리
+
+/****************************************
+		고객센터 테이블 생성 : support
+*****************************************/
+create table support(
+	sid		int				auto_increment	primary key,
+    title	varchar(100)	not null,
+    content	varchar(200),
+    stype	varchar(30)		not null,
+    hits	int,
+    rdate	datetime
+);
+
+show tables;
+select * from support;
+select sid, title, stype, hits, rdate from support;
+desc support;
+
+insert into support(title, stype, hits, rdate)
+select 
+	jt.title,
+    jt.stype,
+    jt.hits,
+    jt.rdate
+from
+	json_table(
+		cast(load_file('C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/support_list.json') 
+				AS CHAR CHARACTER SET utf8mb4 ),
+		'$[*]' COLUMNS (
+			 title   	VARCHAR(100)  	PATH '$.title',
+			 stype   	VARCHAR(30)  	PATH '$.type',
+			 hits		int  			PATH '$.hits',
+			 rdate		datetime  		PATH '$.rdate'
+		   )   
+    ) as jt ;
+
+select distinct stype from support;
 
 
-
-
-
-
-
-
-
-
-
-
+select sid, title, stype, hits, rdate from support;
+select sid, title, stype, hits, rdate from support where stype = "event";
 
 
 
