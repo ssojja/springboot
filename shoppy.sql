@@ -1,5 +1,7 @@
 /* 데이터베이스 생성*/
 create database shoppy;
+create database ssf;
+use ssf;
 
 /* 데이터베이스 열기 */
 use shoppy;
@@ -132,6 +134,10 @@ create table product_qna(
 
 select * from product_qna;
 -- DROP TABLE cart;  
+
+-- JSON이 잘 읽혔는지 확인
+SELECT LENGTH(@json) AS len, JSON_VALID(@json) AS is_valid;
+-- len > 0, is_valid = 1 이면 OK
 
 -- product_qna data insert
 insert into product_qna(title, content, is_complete, is_lock, id, pid, cdate)
@@ -383,7 +389,90 @@ select distinct stype from support;
 select sid, title, stype, hits, rdate from support;
 select sid, title, stype, hits, rdate from support where stype = "event";
 
+/*********************************************************************
+	주문 테이블 : orders
+**********************************************************************/
+use shoppy;
+select database();
+select * from member;
+desc member;
+-- drop table orders;
+create table orders (
+  oid         		int 			auto_increment	primary key,
+  order_code		varchar(40)		not null	unique,		-- 카카오 partner_order_id로 사용
+  member_id	      	varchar(50)    	not null,			-- 회원 아이디
+  status        	enum('대기중','결제중','결제완료','취소','환불','만료')
+					not null default	'대기중',
+  shipping_fee     	int				not null 	default 0,	-- 배송비
+  discount_amount  	int				not null 	default 0,	-- 할인금액
+  total_amount     	int				not null,  				-- 결제요청 금액(= 카카오 amount.total)
 
+  -- 수취/배송 
+  receiver_name    	varchar(50),
+  receiver_phone   	varchar(50),
+  zipcode          	varchar(20),
+  address1         	varchar(255),
+  address2         	varchar(255),
+  memo             	varchar(255),
+  odate				datetime,
+  
+  constraint fk_orders_member foreign key(member_id)	references member(id)
+		on delete cascade	on update cascade
+);
 
+show tables;
+desc orders;
+select * from orders;
 
+/*********************************************************************
+	주문 상세 테이블 : order_detail
+**********************************************************************/
+create table order_detail (
+	odid			int				auto_increment		primary key,
+	order_code		varchar(40)		not null,	
+    pid				int				not null,
+    pname			varchar(50),
+    size			char(2),
+    qty				int,
+    pid_total_price	decimal,		-- 상품 토탈가격
+    discount		decimal,		-- 할인 금액
+	
+    constraint fk_order_order_detail foreign key(order_code)	references orders(order_code)
+		on delete cascade   on update cascade,
+	constraint fk_product_order_detail foreign key(pid)	references product(pid)
+		on delete cascade  on update cascade
+);
 
+show tables;
+desc order_detail;
+
+select * from view_cartlist where id = "hong";
+desc view_cartList;
+
+select * from orders;
+select * from order_detail;
+desc orders;
+select * from order_detail;
+
+--
+-- INSERT INTO 
+-- 	order_detail(order_code, pid, pname, size, qty, pid_total_price, discount)
+SELECT 
+	'abc', pid, name AS pname, size, qty, totalPrice AS pid_total_price, 
+	0
+FROM view_cartlist
+WHERE cid IN (38,40,42);
+
+select * from view_cartlist;
+
+-- mysql은 수정, 삭제 시 update mode를 변경
+SET SQL_SAFE_UPDATES = 0;
+
+delete from orders;   
+      
+select * from orders;
+select * from order_detail;
+
+use shoppy;
+show tables;
+desc view_cartlist;
