@@ -30,7 +30,7 @@ public class JdbcTemplateMemberRepository implements MemberRepository{
     @Override
     public String login(String id) {
         // jdbcTemplate객체를 이용하여 DB의 member 테이블에 select
-        String sql = "Select pwd from member where id = ?";
+        String sql = "Select ifnull(MAX(pwd), null) as pwd from member where id = ?";
 //        Member member = jdbcTemplate.queryForObject(sql,
 //                new BeanPropertyRowMapper<>(Member.class), // RowMapper<T>
 //                id);

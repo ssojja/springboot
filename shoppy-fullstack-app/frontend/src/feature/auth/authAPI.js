@@ -33,10 +33,11 @@ export const getLogIn = (formData, param) => async (dispatch) => {
             axios api 사용
         */
 //        const url = "http://localhost:8080/member/login";
-        const url = "/member/login";
+        const url = "/member/login";    // 프록시를
         const result = await axiosPost(url, formData);
+        console.log("result :: ", result);
 
-        if(result){
+        if(result.login){
             dispatch(logIn({"userId":formData.id}));
 
             // 장바구니 카운트 함수 호출
@@ -50,7 +51,11 @@ export const getLogIn = (formData, param) => async (dispatch) => {
 
 /** LogOut */
 export const getLogOut = () => async (dispatch) => {
-    dispatch(logOut());
-    dispatch(resetCartCount());
-    return true;
+    const url = "/member/logout";
+    const result = await axiosPost(url, {});
+    if(result){
+        dispatch(logOut());
+        dispatch(resetCartCount());
+    }
+    return result;
 }
