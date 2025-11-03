@@ -3,6 +3,7 @@ import { validateFormCheck, validateSignupFormCheck } from '../../utils/validate
 import { axiosPost } from '../../utils/dataFetch.js';
 import { getCartCount } from '../../feature/cart/cartAPI.js';
 import { updateCartCount, resetCartCount } from '../../feature/cart/cartSlice.js';
+import { refreshCsrfToken } from '../csrf/manageCsrfToken.js';
 
 /* Id 중복 체크 */
 export const getIdCheck = (id) => async (dispatch) => {
@@ -54,6 +55,7 @@ export const getLogOut = () => async (dispatch) => {
     const url = "/member/logout";
     const result = await axiosPost(url, {});
     if(result){
+        refreshCsrfToken();
         dispatch(logOut());
         dispatch(resetCartCount());
     }
