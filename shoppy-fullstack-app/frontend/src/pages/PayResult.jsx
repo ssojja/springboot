@@ -1,10 +1,20 @@
 import { useSearchParams } from "react-router-dom";
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { getLogOut } from '../feature/auth/authAPI.js';
+import { logIn } from '../feature/auth/authSlice.js';
 
 export function PayResult() {
   const [searchParams] = useSearchParams();
-
   const orderId = searchParams.get("orderId");
   const status = searchParams.get("status");
+  const userId = searchParams.get("userId");
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+        if (status === "success") dispatch(logIn({ "userId": userId }));
+        else dispatch(getLogOut());
+  }, []);
 
   return (
     <div style={{ padding: "2rem" }}>

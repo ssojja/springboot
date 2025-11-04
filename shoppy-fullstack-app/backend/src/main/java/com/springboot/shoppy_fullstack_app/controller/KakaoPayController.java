@@ -5,10 +5,19 @@ import com.springboot.shoppy_fullstack_app.dto.KakaoApproveResponse;
 import com.springboot.shoppy_fullstack_app.dto.KakaoReadyResponse;
 import com.springboot.shoppy_fullstack_app.service.KakaoPayService;
 import com.springboot.shoppy_fullstack_app.service.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -22,11 +31,13 @@ public class KakaoPayController {
     private final KakaoPayService kakaoPayService;
     private final OrderService orderService;
     private KakaoPay payInfo = null; //KaKaoPay DTO 클래스를 전역으로 선언
+    private final UserDetailsService userDetailsService;
 
     @Autowired
-    public KakaoPayController(KakaoPayService kakaoPayService, OrderService orderService) {
+    public KakaoPayController(KakaoPayService kakaoPayService, OrderService orderService, UserDetailsService userDetailsService) {
         this.kakaoPayService = kakaoPayService;
         this.orderService = orderService;
+        this.userDetailsService = userDetailsService;
     }
 
     /**
@@ -54,7 +65,56 @@ public class KakaoPayController {
      * ✅ 결제 성공
      */
     @GetMapping("/qr/success")
-    public ResponseEntity<Void> success( @RequestParam String orderId, @RequestParam("pg_token") String pgToken) {
+    public ResponseEntity<Void> success( @RequestParam String orderId,
+                                         @RequestParam("pg_token") String pgToken,
+                                         HttpServletRequest request) {
+        
+        /****************  카카오페이 결제 성공 후 세션 복원 시작 ****************/
+        // 0. 현재 SecurityContext에 Authentication이 있는지 확인
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        // anonymousUser 이거나 null 이면, 세션이 끊겼다고 보고 수동 복원 시도
+        if (auth == null || !auth.isAuthenticated()
+                || "anonymousUser".equals(String.valueOf(auth.getPrincipal()))) {
+
+            // 0-1. orderId 기반으로 결제 요청 시 사용했던 userId 조회
+            String userId = kakaoPayService.findByUserId(orderId);  // 이미 사용 중인 메서드라고 하셨음
+            System.out.println("카카오 결제 성공 시 세션 복원 시작 - userId = " + userId);
+
+            if (userId != null) {
+                // 0-2. userId로 UserDetails 조회 (Spring Security 표준)
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userId);
+
+                // 0-3. 새 Authentication 객체 생성
+                UsernamePasswordAuthenticationToken newAuth =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+
+                // 0-4. SecurityContext 생성 및 설정
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(newAuth);
+                SecurityContextHolder.setContext(context);
+
+                // 0-5. HttpSession에도 SecurityContext 저장 (명시적 세션 바인딩)
+                HttpSession session = request.getSession(true);
+                session.setAttribute(
+                        HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                        context
+                );
+
+                auth = newAuth;
+                System.out.println("✅ 카카오 결제 성공 시 Authentication 복원 완료: " + auth.getName());
+            } else {
+                System.out.println("⚠️ userId 조회 실패 - 세션 복원 불가");
+            }
+        } else {
+            System.out.println("✅ 기존 Authentication 유지됨: " + auth.getName());
+        }
+
+        /****************  카카오페이 결제 성공 후 세션 복원 종료 ****************/
 
         // 1. tid, userId 조회
         String tid = kakaoPayService.findByTid(orderId);
@@ -69,7 +129,12 @@ public class KakaoPayController {
         int result = orderService.save(payInfo);
         System.out.println("kakaopay ::: result========>> " + result);
 
-        URI redirect = URI.create("http://localhost:3000/payResult?orderId=" + orderId + "&status=success");
+        URI redirect = URI.create(
+                "http://localhost:3000/payResult"
+                        + "?orderId=" + orderId
+                        + "&status=success"
+                        + "&userId=" + auth.getName()
+        );
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(redirect);
 

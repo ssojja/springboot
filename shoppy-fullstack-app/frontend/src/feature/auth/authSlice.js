@@ -13,10 +13,7 @@ export const authSlice = createSlice({
     logIn(state, action) {
         state.isLogIn = !state.isLogIn;
         const { userId } = action.payload;
-        const logInInfo = {
-            "userId" : userId,
-            "token" : "dkfj1238864"
-        }
+        const logInInfo = { "userId" : userId }
         localStorage.setItem("logInInfo", JSON.stringify(logInInfo));
     },
     logOut(state, action) {
