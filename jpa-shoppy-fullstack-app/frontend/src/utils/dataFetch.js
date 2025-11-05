@@ -1,5 +1,4 @@
 import axios from 'axios';
-//import axios from '../feature/csrf/axiosSetup.js';
 
 /**
  *  fetch 함수를 이용하여 데이터 가져오기
@@ -23,6 +22,7 @@ export const axiosGet = async (url) => {
  */
 export const axiosPost = async (url, formData) => {
     const response = await axios.post(url, formData, {"Content-Type" : "application/json"});
+
 //    console.log(response);
 //    const response = await axios({
 //        method : "POST",
