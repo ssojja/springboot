@@ -5,9 +5,7 @@ import { axiosGet ,axiosData, axiosPost, groupByRows } from '../../utils/dataFet
 export const getProductList = (number) => async (dispatch) => {
 //    const jsonData = await axiosData("/data/products.json");
     const url = "/product/all";
-    console.log("확인",number, url);
     const jsonData = await axiosGet(url);
-    console.log("확인2");
 //    console.log("jsonData ==>" ,jsonData);
 
     const rows = groupByRows(jsonData, number);

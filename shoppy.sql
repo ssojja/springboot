@@ -325,9 +325,9 @@ select
 	c.size,
 	c.qty,
 	c.cid,
-    t.totalPrice
+    t.total_price
  from member m, product p, cart c,
-	(select c.id, sum(c.qty * p.price) as totalPrice 
+	(select c.id, sum(c.qty * p.price) as total_price 
 		from cart c 
 		inner join product p on c.pid = p.pid
         group by c.id) as t
